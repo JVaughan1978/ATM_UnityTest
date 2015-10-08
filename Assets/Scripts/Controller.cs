@@ -11,6 +11,10 @@ public class Controller : MonoBehaviour {
     public string url = "";
     public RootObject data;
     public static bool JSON_LOAD_COMPLETE = false;
+    public static bool OBJECTS_CREATED = false;
+
+    public GameObject canvas = null;
+    public Font defaultFont = null;
     
     public class Button 
     {
@@ -76,28 +80,54 @@ public class Controller : MonoBehaviour {
         return html;
     }
 
+    void CreateTitleGameObject(string text) 
+    {
+        if (canvas == null) {
+            return;
+        }
+
+        GameObject go = new GameObject();
+        go.name = "Title";
+        go.transform.parent = canvas.transform;
+        Text txt = go.AddComponent<Text>();
+        txt.text = text;
+        txt.font = defaultFont;
+        go.AddComponent<TitleSizing>();
+    }
+
 	void Start () 
     {
         string HtmlText = GetHtmlFromUri("http://google.com");
         if (HtmlText == "") 
         {   //No connection
             Debug.LogError("Unable to load " + url + "from web.");
+            Application.Quit();
         } 
         else if (!HtmlText.Contains("schema.org/WebPage")) 
         {   //Error since the beginning of googles html contains that           
             Debug.LogError("Unable to load " + url + "from web.");
+            Application.Quit();
         } 
         else 
         {   //success
             StartCoroutine("WWWGet");
         }
+
+        canvas = GameObject.Find("Canvas");
         //make upper text
+        
         //make scrolling buttons
         //make bottom button
 	}
 	
 	void Update () 
     {
+        if (!OBJECTS_CREATED && JSON_LOAD_COMPLETE) 
+        {
+            CreateTitleGameObject(data.title);
+            OBJECTS_CREATED = true;
+        }
+
         if(Input.GetKeyUp(KeyCode.Space)){
             Debug.Log(data.title);
             Debug.Log(data.maxObjects);
