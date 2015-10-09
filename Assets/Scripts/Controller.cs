@@ -13,15 +13,13 @@ public class Controller : MonoBehaviour {
     private bool JSON_LOAD_COMPLETE = false;
     private bool TITLE_CREATED = false;
     private bool IMAGES_LOADED = false;
-    private bool SPRITES_CREATED = false;
     private bool BUTTONS_CREATED = false;
     private bool MENU_CREATED = false;    
 
     public GameObject canvas = null;
     public GameObject content = null;
-    public Font defaultFont = null; //set in editor
+    public Font defaultFont = null; 
 
-    //private int currentLoadedImageCount = 0;
     private int totalImages = 99;
     private int imagesLoaded = 0;
     public Texture2D defaultTex2D = null; //set in editor
@@ -46,7 +44,7 @@ public class Controller : MonoBehaviour {
     }    
 
     public List<GameObject> genObjects = new List<GameObject>();    
-
+    
     IEnumerator WWWGet() 
     {
         WWW www = new WWW(url);
@@ -108,10 +106,14 @@ public class Controller : MonoBehaviour {
         go.AddComponent<TitleSizing>();
     }
 
+    void SetContentCount() 
+    {
+        content.GetComponent<ContentTransform>().itemCount = data.buttons.Count;
+    }
+
     void GetImages() 
     {
-        totalImages = data.buttons.Count;
-        Debug.Log(totalImages);
+        totalImages = data.buttons.Count;        
 
         for (int i = 0; i < totalImages; i++) {
             //fill in the standins
@@ -144,28 +146,45 @@ public class Controller : MonoBehaviour {
 
     void CreateButtons() 
     {
-        int iterator = 0;
+        int iterator = 0;        
 
         foreach (Button button in data.buttons) 
         {
             if (button.image != null) 
             {
-                //create a sprite
-                Sprite tempSprite = Sprite.Create(images[iterator], new Rect(Vector2.zero, Vector2.one), new Vector2(0.5f, 0.5f));
+                //create a sprite                           
+                Vector2 spriteSize = new Vector2(images[iterator].width, images[iterator].height);
+                Sprite tempSprite = Sprite.Create(images[iterator], new Rect(Vector2.zero, spriteSize), new Vector2(0.5f, 0.5f));
                 sprites.Add(tempSprite);
+
                 //build the button GameObject;
                 GameObject go = new GameObject();
                 go.name = data.buttons[iterator].title;
                 UnityEngine.UI.Image uiSprite = go.AddComponent<UnityEngine.UI.Image>();
+                uiSprite.sprite = tempSprite;
                 UnityEngine.UI.Button uiButton = go.AddComponent<UnityEngine.UI.Button>();
                 uiButton.targetGraphic = uiSprite;
+                
+                //build the text child of the button
                 GameObject textGO = new GameObject();
                 textGO.name = "Text";
                 Text text = textGO.AddComponent<Text>();
                 text.text = data.buttons[iterator].title;
+                text.font = defaultFont;
+                text.color = Color.white;  
+                //missing offset for text...
+             
                 //going to need some more positional stuff for the scroll window
                 textGO.transform.SetParent(uiButton.gameObject.transform);
-                uiButton.gameObject.transform.SetParent(canvas.transform);
+                go.transform.SetParent(content.transform);
+                go.transform.localPosition = Vector3.zero;
+
+                //adding transform tools
+                ButtonTransform bt = go.AddComponent<ButtonTransform>();
+                bt.imageWidth = (int)spriteSize.x;
+                bt.imageHeight = (int)spriteSize.y;
+                bt.offset = iterator;
+                bt.total = totalImages;
             }            
             iterator++;
         }
@@ -196,14 +215,16 @@ public class Controller : MonoBehaviour {
             StartCoroutine("WWWGet");            
         }
 
-        canvas = GameObject.Find("Canvas");        
+        canvas = GameObject.Find("Canvas");
+        content = GameObject.Find("Content");
 	}
 	
 	void Update () 
     {
         if (!TITLE_CREATED && JSON_LOAD_COMPLETE) 
         {
-            CreateTitleGameObject(data.title);            
+            CreateTitleGameObject(data.title);
+            SetContentCount();
             TITLE_CREATED = true;
         }
 
@@ -213,10 +234,8 @@ public class Controller : MonoBehaviour {
             IMAGES_LOADED = true;            
         }
         
-        //then sprites and buttons if possible
         if (imagesLoaded == totalImages && !BUTTONS_CREATED) {
             CreateButtons();
-            //work on the scrolling list;
             BUTTONS_CREATED = true;
         }      
     }

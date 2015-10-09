@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ColliderTransform : MonoBehaviour 
 {
-    public GameObject camera = null; // set by user;   
+    public GameObject currCam = null; // set by user;   
 
     private int _lastScreenWidth = 0;
     private int _lastScreenHeight = 0;
@@ -13,7 +13,7 @@ public class ColliderTransform : MonoBehaviour
     
     void SetPosition() 
     {
-        Camera cam = camera.GetComponent<Camera>();
+        Camera cam = currCam.GetComponent<Camera>();
         Vector3 offsetPosition = new Vector3(((float)Screen.width * 0.42f),((float)Screen.height * 0.5f), 10.0f);
         Vector3 position = cam.ScreenToWorldPoint(offsetPosition);
         transform.position = position;
@@ -37,13 +37,13 @@ public class ColliderTransform : MonoBehaviour
             scalarY = 1.0f / 0.8f;
         }
 
-        Vector3 scale = new Vector3(scalarX * scalarConstant, scalarY * scalarConstant, scalarZ * scalarConstant);
-        Debug.Log(scale);
+        Vector3 scale = new Vector3(scalarX * scalarConstant, scalarY * scalarConstant, scalarZ * scalarConstant);        
         transform.localScale = scale;
     }
 
 	// Use this for initialization
-	void Start () {        
+	void Start () {
+        currCam = GameObject.Find("Main Camera");
         _lastScreenWidth = Screen.width;
         _lastScreenHeight = Screen.height;
         SetPosition();
