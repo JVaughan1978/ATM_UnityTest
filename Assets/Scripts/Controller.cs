@@ -108,7 +108,7 @@ public class Controller : MonoBehaviour {
 
     void SetContentCount() 
     {
-        content.GetComponent<ContentTransform>().itemCount = data.buttons.Count;
+        content.GetComponent<ContentTransform>().itemCount = imagesLoaded;
     }
 
     void GetImages() 
@@ -146,7 +146,19 @@ public class Controller : MonoBehaviour {
 
     void CreateButtons() 
     {
-        int iterator = 0;        
+        int spriteCount = 0;
+        
+        foreach (Button button in data.buttons) 
+        {            
+            if (button.image != null) 
+            {
+                spriteCount++;
+            }
+        }
+        totalImages = spriteCount;
+
+        int iterator = 0;
+        int offsetCounter = 0;
 
         foreach (Button button in data.buttons) 
         {
@@ -172,7 +184,7 @@ public class Controller : MonoBehaviour {
                 text.text = data.buttons[iterator].title;
                 text.font = defaultFont;
                 text.color = Color.white;  
-                //missing offset for text...
+                //HACK: missing offset for text...
              
                 //going to need some more positional stuff for the scroll window
                 textGO.transform.SetParent(uiButton.gameObject.transform);
@@ -183,10 +195,12 @@ public class Controller : MonoBehaviour {
                 ButtonTransform bt = go.AddComponent<ButtonTransform>();
                 bt.imageWidth = (int)spriteSize.x;
                 bt.imageHeight = (int)spriteSize.y;
-                bt.offset = iterator;
+                bt.offset = offsetCounter;
                 bt.total = totalImages;
-            }            
-            iterator++;
+                //Debug.Log(totalImages + " iterator: " + iterator);
+                offsetCounter++;
+            }
+            iterator++;     
         }
     }    
 
@@ -224,17 +238,17 @@ public class Controller : MonoBehaviour {
         if (!TITLE_CREATED && JSON_LOAD_COMPLETE) 
         {
             CreateTitleGameObject(data.title);
-            SetContentCount();
             TITLE_CREATED = true;
         }
 
         if (!IMAGES_LOADED && JSON_LOAD_COMPLETE) 
         {
-            GetImages();
+            GetImages();            
             IMAGES_LOADED = true;            
         }
         
-        if (imagesLoaded == totalImages && !BUTTONS_CREATED) {
+        if (imagesLoaded == totalImages && !BUTTONS_CREATED) {            
+            SetContentCount();
             CreateButtons();
             BUTTONS_CREATED = true;
         }      

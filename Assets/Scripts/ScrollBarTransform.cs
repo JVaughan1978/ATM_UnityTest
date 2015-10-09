@@ -14,7 +14,8 @@ public class ScrollBarTransform : MonoBehaviour
 	void Start () 
     {
         m_rectTransform = GetComponent<RectTransform>();
-        height = (int)((float)Screen.height * 0.9f);	    xOffset = (int)(((float)Screen.width * 0.5f) - ((float)width * 0.5f)) - baseOffset;
+        height = (int)((float)Screen.height * 0.9f);	    
+        xOffset = (int)(((float)Screen.width * 0.5f) - ((float)width * 0.5f)) - baseOffset;
 	}
 	
 	// Update is called once per frame

@@ -43,12 +43,15 @@ public class ScrollBarVisibility : MonoBehaviour {
     }
 
 	// Update is called once per frame
-	void LateUpdate () 
+	void Update () 
     {
         if(!allSet)
         {
-            Invoke("SetVisibility", 0.33f);
-            allSet = true;
+            if (content.GetComponent<ContentTransform>().allSet == true)
+            {
+                SetVisibility();
+                allSet = true;
+            }                
         }        
 	}
 }
