@@ -41,9 +41,7 @@ public class Controller : MonoBehaviour {
         public string title { get; set; }
         public int maxObjects { get; set; }        
         public List<Button> buttons { get; set; }
-    }    
-
-    public List<GameObject> genObjects = new List<GameObject>();    
+    }           
     
     IEnumerator WWWGet() 
     {
@@ -115,11 +113,9 @@ public class Controller : MonoBehaviour {
     {
         totalImages = data.buttons.Count;        
 
-        for (int i = 0; i < totalImages; i++) {
-            //fill in the standins
+        for (int i = 0; i < totalImages; i++) {            
             Texture2D tex2D = defaultTex2D;
             images.Add(tex2D);
-            //then fetch the images from the web
             StartCoroutine(WWWGetImages(data.buttons[i].image, i));            
         }       
     }
@@ -197,7 +193,6 @@ public class Controller : MonoBehaviour {
                 bt.imageHeight = (int)spriteSize.y;
                 bt.offset = offsetCounter;
                 bt.total = totalImages;
-                //Debug.Log(totalImages + " iterator: " + iterator);
                 offsetCounter++;
             }
             iterator++;     
