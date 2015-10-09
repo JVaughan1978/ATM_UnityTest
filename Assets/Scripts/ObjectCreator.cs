@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,6 +13,9 @@ public class ObjectCreator : MonoBehaviour
     public float _velocity = 1;
     public float _scaleFactor = 1f;
     public Material baseMat = null;
+
+    private GameObject canvas = null;
+    public Font defaultFont = null;
 
     public int maxObjects = 0;
     public static int totalCollisions = 0;    
@@ -77,6 +81,8 @@ public class ObjectCreator : MonoBehaviour
         genMaterials.Add(mat);
 
         //Add UI Elements
+        
+        
         //Add Counter
         go.AddComponent<CollisionCounter>();
 
@@ -101,12 +107,21 @@ public class ObjectCreator : MonoBehaviour
 
         //get the color and create the material
         Material mat = new Material(baseMat);
-        mat.color = HexToColor(color);
-        Debug.Log(mat.color);
-        genMaterials.Add(mat);
+        mat.color = HexToColor(color);        
+        genMaterials.Add(mat);       
 
         //colliderTest
-        go.AddComponent<CollisionCounter>();
+        CollisionCounter colCount = go.AddComponent<CollisionCounter>();
+
+        //add UI Jazz
+        GameObject text = new GameObject();
+        text.name = "Text";
+        text.transform.parent = canvas.transform;
+        Text txt = text.AddComponent<Text>();
+        txt.font = defaultFont;
+        ObjectGUI oUI = text.AddComponent<ObjectGUI>();
+        oUI.followedObject = go;
+        oUI.cc = colCount;
 
         go.GetComponent<MeshRenderer>().material = mat;
         genObjects.Add(go);
@@ -115,13 +130,13 @@ public class ObjectCreator : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        
+        canvas = GameObject.Find("Canvas");
 	}
 	
 	// Update is called once per frame
 	void Update () 
     {
-        Debug.Log(totalCollisions);
+        //Debug.Log(totalCollisions);
 
 	    if(Input.GetKeyUp(KeyCode.D))
         {
