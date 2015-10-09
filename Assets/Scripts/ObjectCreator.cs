@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+//using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -22,7 +24,22 @@ public class ObjectCreator : MonoBehaviour
     
     public List<Material> genMaterials = new List<Material>();
     public List<GameObject> genObjects = new List<GameObject>();
+    
+    public void DestroyAll() 
+    { 
+        foreach(GameObject go in genObjects) 
+        {
+            Destroy(go);
+        }
 
+        foreach(Material mat in genMaterials) 
+        {
+            Destroy(mat);
+        }
+
+        genMaterials = new List<Material>();
+        genObjects = new List<GameObject>();
+    }
     public void CreateObject(string name, string color, string type, bool gravity) 
     {
         //if object count == maxObjects destroy an object first;
@@ -53,7 +70,28 @@ public class ObjectCreator : MonoBehaviour
         return hex;
     }
 
+    public static string RemoveSpecialCharacters(string str) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.Length; i++) {
+            if ((str[i] >= '0' && str[i] <= '9')
+                || (str[i] >= 'A' && str[i] <= 'z'
+                    || (str[i] == '.' || str[i] == '_'))) {
+                sb.Append(str[i]);
+            }
+        }
+
+        return sb.ToString();
+    }
+
     Color HexToColor(string hex) {
+
+        if (hex == null) {
+            return new Color(0.5f, 0.5f, 0.5f);
+        }
+
+        hex = hex.ToUpper();
+        hex = RemoveSpecialCharacters(hex);
+
         byte r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
         byte g = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
         byte b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
@@ -80,11 +118,18 @@ public class ObjectCreator : MonoBehaviour
         mat.color = HexToColor(color);       
         genMaterials.Add(mat);
 
-        //Add UI Elements
-        
-        
-        //Add Counter
-        go.AddComponent<CollisionCounter>();
+        //colliderTest
+        CollisionCounter colCount = go.AddComponent<CollisionCounter>();
+
+        //add UI Jazz
+        GameObject text = new GameObject();
+        text.name = "Text";
+        text.transform.parent = canvas.transform;
+        Text txt = text.AddComponent<Text>();
+        txt.font = defaultFont;
+        ObjectGUI oUI = text.AddComponent<ObjectGUI>();
+        oUI.followedObject = go;
+        oUI.cc = colCount;
 
         go.GetComponent<MeshRenderer>().material = mat;
         genObjects.Add(go);
@@ -93,8 +138,7 @@ public class ObjectCreator : MonoBehaviour
     void CreateSphere(string name, string color, bool gravity) 
     {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        go.name = name;
-        //go.transform.parent = transform;
+        go.name = name;        
         go.transform.localPosition = Vector3.zero;
         go.transform.localScale = new Vector3(_scaleFactor, _scaleFactor, _scaleFactor);
 
@@ -108,7 +152,7 @@ public class ObjectCreator : MonoBehaviour
         //get the color and create the material
         Material mat = new Material(baseMat);
         mat.color = HexToColor(color);        
-        genMaterials.Add(mat);       
+        genMaterials.Add(mat);
 
         //colliderTest
         CollisionCounter colCount = go.AddComponent<CollisionCounter>();

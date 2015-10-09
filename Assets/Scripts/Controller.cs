@@ -18,6 +18,8 @@ public class Controller : MonoBehaviour {
 
     public GameObject canvas = null;
     public GameObject content = null;
+    public GameObject collision = null;
+    private GameObject title = null;
     public Font defaultFont = null; 
 
     private int totalImages = 99;
@@ -140,6 +142,19 @@ public class Controller : MonoBehaviour {
         }        
     }
 
+    void FindInJSON(string a) 
+    {
+        ObjectCreator objRef = collision.GetComponent<ObjectCreator>();
+
+        foreach (Button button in data.buttons) 
+        {
+            if (button.title == a) 
+            {
+                objRef.CreateObject(button.title, button.color, button.type, button.obeyGravity);
+            }
+        }
+    }
+    
     void CreateButtons() 
     {
         int spriteCount = 0;
@@ -172,7 +187,8 @@ public class Controller : MonoBehaviour {
                 uiSprite.sprite = tempSprite;
                 UnityEngine.UI.Button uiButton = go.AddComponent<UnityEngine.UI.Button>();
                 uiButton.targetGraphic = uiSprite;
-                
+                uiButton.onClick.AddListener(delegate { FindInJSON(uiButton.name); });
+
                 //build the text child of the button
                 GameObject textGO = new GameObject();
                 textGO.name = "Text";
@@ -226,6 +242,7 @@ public class Controller : MonoBehaviour {
 
         canvas = GameObject.Find("Canvas");
         content = GameObject.Find("Content");
+        collision = GameObject.Find("Collider");
 	}
 	
 	void Update () 

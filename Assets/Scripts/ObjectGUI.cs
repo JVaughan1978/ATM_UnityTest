@@ -26,7 +26,6 @@ public class ObjectGUI : MonoBehaviour {
         //position        
         Vector3 position = mainCam.GetComponent<Camera>().WorldToScreenPoint(followedObject.transform.position);
         position = new Vector3( (position.x - ((float)Screen.width * 0.5f)), (position.y - ((float)Screen.height * 0.5f)), position.z);
-        rect.localPosition = position;
-        Debug.Log(rect.localPosition);
+        rect.localPosition = position;        
 	}
 }
