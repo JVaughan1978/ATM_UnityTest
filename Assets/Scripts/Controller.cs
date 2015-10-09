@@ -18,6 +18,7 @@ public class Controller : MonoBehaviour {
     private bool MENU_CREATED = false;    
 
     public GameObject canvas = null;
+    public GameObject content = null;
     public Font defaultFont = null; //set in editor
 
     //private int currentLoadedImageCount = 0;
@@ -168,9 +169,7 @@ public class Controller : MonoBehaviour {
             }            
             iterator++;
         }
-    }
-
-    
+    }    
 
     void CreateButton(Button data) 
     {
@@ -219,28 +218,6 @@ public class Controller : MonoBehaviour {
             CreateButtons();
             //work on the scrolling list;
             BUTTONS_CREATED = true;
-        }
-        
-        //then build the menu
-
-        if (Input.GetKeyUp(KeyCode.B)) 
-        {
-            GameObject go = new GameObject();
-            go.name = data.buttons[0].title;
-            UnityEngine.UI.Image uiSprite = go.AddComponent<UnityEngine.UI.Image>();
-            UnityEngine.UI.Button uiButton = go.AddComponent<UnityEngine.UI.Button>();
-            uiButton.targetGraphic = uiSprite;
-            GameObject text = new GameObject();
-            text.name = "Text";
-            text.transform.SetParent(uiButton.gameObject.transform);
-            uiButton.gameObject.transform.SetParent(canvas.transform);
-        }
-
-        if(Input.GetKeyUp(KeyCode.Space))
-        {
-            Debug.Log(data.title);
-            Debug.Log(data.maxObjects);
-            Debug.Log(data.buttons.Count);
-        }        
+        }      
     }
 }
